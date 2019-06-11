@@ -61,7 +61,7 @@ packageDef
     ;
 
 fullIdentifier
-    : identifier ('.' identifier)* 
+    : identifier ('.' identifier)*
     ;
 
 identifier 
@@ -127,7 +127,7 @@ messageBody
     ;
 
 field
-    : REPEATED? fieldType EQUAL NUMBER SEMICOL
+    : REPEATED? fieldType identifier EQUAL NUMBER SEMICOL
     ;
 
 fieldType 
