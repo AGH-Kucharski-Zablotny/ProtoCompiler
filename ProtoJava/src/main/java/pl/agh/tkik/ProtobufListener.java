@@ -25,13 +25,23 @@ public class ProtobufListener extends OurProtoBaseListener {
 
     @Override
     public void enterFullIdentifier(OurProtoParser.FullIdentifierContext ctx) {
-        compiledFileBuilder.append(ctx.getText());
+        if (ctx.getParent().getClass() != OurProtoParser.RpcDefContext.class) {
+            compiledFileBuilder.append(ctx.getText());
+        }
     }
 
     @Override
     public void enterIdentifier(OurProtoParser.IdentifierContext ctx) {
-        if (ctx.getParent().getClass() != OurProtoParser.FullIdentifierContext.class) {
+        if (ctx.getParent().getClass() != OurProtoParser.FullIdentifierContext.class
+                && ctx.getParent().getClass() != OurProtoParser.RpcDefContext.class) {
             compiledFileBuilder.append(ctx.getText());
+        }
+    }
+
+    @Override
+    public void exitIdentifier(OurProtoParser.IdentifierContext ctx) {
+        if (ctx.getParent().getClass() == OurProtoParser.ServiceDefContext.class) {
+            compiledFileBuilder.append("{\n");
         }
     }
 
@@ -81,8 +91,7 @@ public class ProtobufListener extends OurProtoBaseListener {
     }
 
     private void appendSetter(OurProtoParser.FieldContext ctx, String fieldName, String methodFieldName) {
-        appendFieldType(ctx);
-        compiledFileBuilder.append("set")
+        compiledFileBuilder.append("void set")
                 .append(methodFieldName)
                 .append("(");
         appendFieldType(ctx);
@@ -145,5 +154,91 @@ public class ProtobufListener extends OurProtoBaseListener {
         if (ctx.STRING() != null || ctx.BYTE() != null) {
             compiledFileBuilder.append("String");
         }
+    }
+
+    @Override
+    public void exitType(OurProtoParser.TypeContext ctx) {
+        if (ctx.getParent().getClass() == OurProtoParser.MapFieldContext.class) {
+            compiledFileBuilder.append("> ");
+        }
+    }
+
+    @Override
+    public void enterMapField(OurProtoParser.MapFieldContext ctx) {
+        compiledFileBuilder.append("java.util.Map<");
+    }
+
+    @Override
+    public void exitMapField(OurProtoParser.MapFieldContext ctx) {
+        compiledFileBuilder.append(";\n");
+
+        String fieldName = ctx.identifier().getText();
+        String methodFieldName = fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
+
+        compiledFileBuilder.append("public java.util.Map<");
+        enterKeyType(ctx.keyType());
+        exitKeyType(ctx.keyType());
+        compiledFileBuilder.append("get")
+                .append(methodFieldName)
+                .append("() { return this.")
+                .append(fieldName)
+                .append("; }\n");
+
+        compiledFileBuilder.append("public void set")
+                .append(methodFieldName)
+                .append("(");
+        enterKeyType(ctx.keyType());
+        exitKeyType(ctx.keyType());
+        compiledFileBuilder.append("item { this.")
+                .append(fieldName)
+                .append(" = item; }\n\n");
+    }
+
+    @Override
+    public void enterKeyType(OurProtoParser.KeyTypeContext ctx) {
+        if (ctx.INT32() != null || ctx.UINT32() != null || ctx.SINT32() != null
+                || ctx.FIXED32() != null || ctx.SFIXED32()!= null ) {
+            compiledFileBuilder.append("Integer");
+        }
+        if (ctx.INT64() != null || ctx.UINT64() != null || ctx.SINT64()!= null
+                || ctx.FIXED64() != null || ctx.SFIXED64() != null) {
+            compiledFileBuilder.append("Long");
+        }
+        if (ctx.BOOL() != null) {
+            compiledFileBuilder.append("Boolean");
+        }
+        if (ctx.STRING() != null) {
+            compiledFileBuilder.append("String");
+        }
+    }
+
+    @Override
+    public void exitKeyType(OurProtoParser.KeyTypeContext ctx) {
+        compiledFileBuilder.append(", ");
+    }
+
+    @Override
+    public void enterServiceDef(OurProtoParser.ServiceDefContext ctx) {
+        compiledFileBuilder.append("interface ");
+    }
+
+    @Override
+    public void exitServiceDef(OurProtoParser.ServiceDefContext ctx) {
+        compiledFileBuilder.append("}\n");
+    }
+
+    @Override
+    public void enterRpcDef(OurProtoParser.RpcDefContext ctx) {
+        compiledFileBuilder.append(ctx.fullIdentifier(1).getText())
+                .append(" ")
+                .append(ctx.identifier().getText())
+                .append("(")
+                .append(ctx.fullIdentifier(0).getText())
+                .append(" request)");
+    }
+
+    @Override
+    public void exitRpcDef(OurProtoParser.RpcDefContext ctx) {
+        compiledFileBuilder.append(";\n");
     }
 }
