@@ -296,11 +296,11 @@ public class ProtobufListener extends OurProtoBaseListener {
 
     @Override
     public void exitEnumBody(OurProtoParser.EnumBodyContext ctx) {
-        compiledFileBuilder.append("}\n");
+        compiledFileBuilder.append(";}\n");
     }
 
     @Override
     public void exitEnumField(OurProtoParser.EnumFieldContext ctx) {
-        compiledFileBuilder.append(";\n");
+        compiledFileBuilder.append(",\n");
     }
 }
