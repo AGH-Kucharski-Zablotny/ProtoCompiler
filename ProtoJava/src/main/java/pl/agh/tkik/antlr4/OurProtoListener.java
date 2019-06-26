@@ -237,26 +237,6 @@ public interface OurProtoListener extends ParseTreeListener {
 	 */
 	void exitEnumField(OurProtoParser.EnumFieldContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link OurProtoParser#oneofDef}.
-	 * @param ctx the parse tree
-	 */
-	void enterOneofDef(OurProtoParser.OneofDefContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link OurProtoParser#oneofDef}.
-	 * @param ctx the parse tree
-	 */
-	void exitOneofDef(OurProtoParser.OneofDefContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link OurProtoParser#oneOfField}.
-	 * @param ctx the parse tree
-	 */
-	void enterOneOfField(OurProtoParser.OneOfFieldContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link OurProtoParser#oneOfField}.
-	 * @param ctx the parse tree
-	 */
-	void exitOneOfField(OurProtoParser.OneOfFieldContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link OurProtoParser#mapField}.
 	 * @param ctx the parse tree
 	 */

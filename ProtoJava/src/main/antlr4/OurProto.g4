@@ -25,7 +25,6 @@ BOOL : 'bool' ;
 STRING : 'string' ;
 BYTE : 'bytes' ;
 ENUM : 'enum' ;
-ONEOF : 'oneofDeff' ;
 MAP : 'map' ;
 LPARA : '(' ;
 RPARA : ')' ;
@@ -120,7 +119,6 @@ messageBody
             field
         |   enumDefinition
         |   messageDef
-        |   oneofDef
         |   mapField
         |   emptyStatement
     )* RCBRA
@@ -157,18 +155,10 @@ enumDefinition
     ;
 
 enumBody
-    : RCBRA (enumField | emptyStatement)*
+    : LCBRA (enumField | emptyStatement)* RCBRA
     ;
 
 enumField
-    : identifier EQUAL NUMBER SEMICOL
-    ;
-
-oneofDef
-    : ONEOF identifier RCBRA (oneOfField | emptyStatement)*
-    ;
-
-oneOfField
     : identifier EQUAL NUMBER SEMICOL
     ;
 

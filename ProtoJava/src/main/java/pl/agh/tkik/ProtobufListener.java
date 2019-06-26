@@ -1,5 +1,6 @@
 package pl.agh.tkik;
 
+
 import pl.agh.tkik.antlr4.OurProtoBaseListener;
 import pl.agh.tkik.antlr4.OurProtoParser;
 
@@ -7,7 +8,19 @@ public class ProtobufListener extends OurProtoBaseListener {
 
     private StringBuilder compiledFileBuilder = new StringBuilder();
 
+    private String outerClass;
+
     private boolean isRepeatedField = false;
+    private boolean isOuterClassCreated = false;
+
+    public ProtobufListener(String fileName) {
+        outerClass = fileName.substring(0, fileName.indexOf("."));
+        outerClass = outerClass.substring(0,1).toUpperCase() + outerClass.substring(1);
+    }
+
+    public String getOuterClass() {
+        return outerClass;
+    }
 
     public String getResult() {
         return compiledFileBuilder.toString();
@@ -24,8 +37,23 @@ public class ProtobufListener extends OurProtoBaseListener {
     }
 
     @Override
+    public void enterDefinition(OurProtoParser.DefinitionContext ctx) {
+        if (!isOuterClassCreated) {
+            compiledFileBuilder.append("public class ").append(outerClass).append(" {\n");
+            isOuterClassCreated = true;
+        }
+    }
+
+    @Override
+    public void exitDefinition(OurProtoParser.DefinitionContext ctx) {
+        compiledFileBuilder.append("}");
+    }
+
+    @Override
     public void enterFullIdentifier(OurProtoParser.FullIdentifierContext ctx) {
-        if (ctx.getParent().getClass() != OurProtoParser.RpcDefContext.class) {
+        if (ctx.getParent().getClass() != OurProtoParser.RpcDefContext.class
+                && ctx.getParent().getClass() != OurProtoParser.ConstantContext.class
+                && ctx.getParent().getClass() != OurProtoParser.OptionNameContext.class) {
             compiledFileBuilder.append(ctx.getText());
         }
     }
@@ -33,7 +61,9 @@ public class ProtobufListener extends OurProtoBaseListener {
     @Override
     public void enterIdentifier(OurProtoParser.IdentifierContext ctx) {
         if (ctx.getParent().getClass() != OurProtoParser.FullIdentifierContext.class
-                && ctx.getParent().getClass() != OurProtoParser.RpcDefContext.class) {
+                && ctx.getParent().getClass() != OurProtoParser.RpcDefContext.class
+                && ctx.getParent().getClass() != OurProtoParser.ConstantContext.class
+                && ctx.getParent().getClass() != OurProtoParser.OptionNameContext.class) {
             compiledFileBuilder.append(ctx.getText());
         }
     }
@@ -82,6 +112,7 @@ public class ProtobufListener extends OurProtoBaseListener {
     }
 
     private void appendGetter(OurProtoParser.FieldContext ctx, String fieldName, String methodFieldName) {
+        compiledFileBuilder.append("public ");
         appendFieldType(ctx);
         compiledFileBuilder.append("get")
                 .append(methodFieldName)
@@ -91,7 +122,7 @@ public class ProtobufListener extends OurProtoBaseListener {
     }
 
     private void appendSetter(OurProtoParser.FieldContext ctx, String fieldName, String methodFieldName) {
-        compiledFileBuilder.append("void set")
+        compiledFileBuilder.append("public void set")
                 .append(methodFieldName)
                 .append("(");
         appendFieldType(ctx);
@@ -178,6 +209,8 @@ public class ProtobufListener extends OurProtoBaseListener {
         compiledFileBuilder.append("public java.util.Map<");
         enterKeyType(ctx.keyType());
         exitKeyType(ctx.keyType());
+        enterType(ctx.type());
+        exitType(ctx.type());
         compiledFileBuilder.append("get")
                 .append(methodFieldName)
                 .append("() { return this.")
@@ -186,10 +219,12 @@ public class ProtobufListener extends OurProtoBaseListener {
 
         compiledFileBuilder.append("public void set")
                 .append(methodFieldName)
-                .append("(");
+                .append("(java.util.Map<");
         enterKeyType(ctx.keyType());
         exitKeyType(ctx.keyType());
-        compiledFileBuilder.append("item { this.")
+        enterType(ctx.type());
+        exitType(ctx.type());
+        compiledFileBuilder.append("item) { this.")
                 .append(fieldName)
                 .append(" = item; }\n\n");
     }
@@ -239,6 +274,33 @@ public class ProtobufListener extends OurProtoBaseListener {
 
     @Override
     public void exitRpcDef(OurProtoParser.RpcDefContext ctx) {
+        compiledFileBuilder.append(";\n");
+    }
+
+    @Override
+    public void enterOption(OurProtoParser.OptionContext ctx) {
+        if (ctx.optionName().getText().equals("java_outer_classname")) {
+            outerClass = ctx.constant().getText();
+        }
+    }
+
+    @Override
+    public void enterEnumDefinition(OurProtoParser.EnumDefinitionContext ctx) {
+        compiledFileBuilder.append("enum ");
+    }
+
+    @Override
+    public void enterEnumBody(OurProtoParser.EnumBodyContext ctx) {
+        compiledFileBuilder.append("{\n");
+    }
+
+    @Override
+    public void exitEnumBody(OurProtoParser.EnumBodyContext ctx) {
+        compiledFileBuilder.append("}\n");
+    }
+
+    @Override
+    public void exitEnumField(OurProtoParser.EnumFieldContext ctx) {
         compiledFileBuilder.append(";\n");
     }
 }

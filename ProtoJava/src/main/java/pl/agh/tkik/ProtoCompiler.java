@@ -9,7 +9,10 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import pl.agh.tkik.antlr4.OurProtoLexer;
 import pl.agh.tkik.antlr4.OurProtoParser;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -36,10 +39,12 @@ public class ProtoCompiler {
 
             ParseTree tree = protoParser.protoFileDef();
             ParseTreeWalker walker = new ParseTreeWalker();
-            ProtobufListener listener = new ProtobufListener();
+            ProtobufListener listener = new ProtobufListener(filePath.getFileName().toString());
             walker.walk(listener, tree);
 
-            System.out.println(listener.getResult());
+            String compiledFileContent = listener.getResult();
+            System.out.println(compiledFileContent);
+            Files.write(Paths.get(listener.getOuterClass() + ".java"), compiledFileContent.getBytes());
 
         } catch (IOException e) {
             System.err.println("Error: File not found");

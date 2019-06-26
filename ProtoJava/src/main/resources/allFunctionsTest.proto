@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package pl.edu.agh.tkik;
+
+option java_outer_classname = MyProtoCompilationResult;
+
+message MyMessage1 {
+    int32 intField = 1;
+    int64 longField = 2;
+    uint32 uintField = 3;
+    uint64 ulongField = 4;
+    sint32 sintField = 5;
+    sint64 slongField = 6;
+    repeated string listField = 7;
+}
+
+message MyMessage2 {
+    fixed32 fixedIntField = 1;
+    fixed64 fixedLongField = 2;
+    sfixed32 sfixedIntField = 3;
+    sfixed64 sfixedLongField = 4;
+    bool logicField = 5;
+    string strField = 6;
+    map<int32, string> mField = 7;
+}
+
+enum MyEnum {
+    ONE = 0;
+    TWO = 1;
+    THREE = 2;
+}
+
+service MyService {
+    rpc interfaceMethod1 (MyMessage1) returns (MyMessage2);
+    rpc interfaceMethod2 (MyMessage2) returns (MyMessage1);
+}

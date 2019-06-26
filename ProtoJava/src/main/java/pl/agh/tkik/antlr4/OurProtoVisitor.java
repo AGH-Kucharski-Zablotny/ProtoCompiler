@@ -148,18 +148,6 @@ public interface OurProtoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitEnumField(OurProtoParser.EnumFieldContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link OurProtoParser#oneofDef}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOneofDef(OurProtoParser.OneofDefContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link OurProtoParser#oneOfField}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOneOfField(OurProtoParser.OneOfFieldContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link OurProtoParser#mapField}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -291,30 +291,6 @@ public class OurProtoBaseListener implements OurProtoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOneofDef(OurProtoParser.OneofDefContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOneofDef(OurProtoParser.OneofDefContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterOneOfField(OurProtoParser.OneOfFieldContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOneOfField(OurProtoParser.OneOfFieldContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterMapField(OurProtoParser.MapFieldContext ctx) { }
 	/**
 	 * {@inheritDoc}
